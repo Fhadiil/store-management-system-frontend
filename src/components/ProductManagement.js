@@ -165,6 +165,7 @@ const ProductManagement = () => {
       if (editingProduct) {
         await api.put(`/products/${editingProduct.id}/`, dataToSend);
       } else {
+        console.log(dataToSend);
         await api.post("/products/", dataToSend);
       }
       alert("Product saved successfully");

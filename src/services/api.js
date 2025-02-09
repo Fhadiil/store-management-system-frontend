@@ -1,7 +1,7 @@
 // src/services/api.js
 import axios from "axios";
 
-const API_URL = "http://localhost:8000/store/api"; // Update with your backend URL
+const API_URL = "http://localhost:8000/store/api";
 
 const api = axios.create({
   baseURL: API_URL,

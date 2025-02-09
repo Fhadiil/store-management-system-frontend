@@ -38,8 +38,9 @@ const SalesManagement = () => {
           api.get("/stores/"),
         ]);
         setProducts(productsResponse.data);
-        setStore(storeResponse.data[0]); // Assuming first store
+        setStore(storeResponse.data[0]);
       } catch (error) {
+        alert("Failed to fetch products. Please try again.");
         console.error("Failed to fetch initial data", error);
       }
     };
@@ -99,9 +100,9 @@ const SalesManagement = () => {
     try {
       const salesPromises = cart.map((item) =>
         api.post("/sale/", {
+          store: store.id,
           product: item.id,
           quantity: item.quantity,
-          total_price: item.price * item.quantity,
         })
       );
 
