@@ -23,6 +23,10 @@ import {
 } from "lucide-react";
 // import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
+import { Tabs, TabList, Tab, TabPanel } from "react-tabs";
+import "react-tabs/style/react-tabs.css";
+import SalesReport from "./reports/SalesReport";
+import InventoryReport from "./reports/InventoryReport";
 
 const StoreDashboard = () => {
   const [salesData, setSalesData] = useState([]);
@@ -73,112 +77,137 @@ const StoreDashboard = () => {
           /> */}
         </div>
       </div>
+      <Tabs>
+        <TabList className="flex border-b border-gray-200 mb-6">
+          <Tab className="px-4 py-2 font-medium text-sm focus:outline-none ui-selected:border-b-2 ui-selected:border-blue-500 ui-selected:text-blue-600">
+            Overview
+          </Tab>
+          <Tab className="px-4 py-2 font-medium text-sm focus:outline-none ui-selected:border-b-2 ui-selected:border-blue-500 ui-selected:text-blue-600">
+            Sales Reports
+          </Tab>
+          <Tab className="px-4 py-2 font-medium text-sm focus:outline-none ui-selected:border-b-2 ui-selected:border-blue-500 ui-selected:text-blue-600">
+            Inventory Reports
+          </Tab>
+        </TabList>
 
-      {/* Main Stats */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-        <StatCard
-          icon={Package}
-          title="Total Products"
-          value={totalProducts}
-          trend={12}
-          trendUp
-        />
-        <StatCard
-          icon={ShoppingCart}
-          title="Total Sales"
-          value={`₦${totalSales}`}
-          trend={8.2}
-          trendUp
-        />
-        <StatCard
-          icon={DollarSign}
-          title="Net Profit"
-          value={`₦${netProfit}`}
-          trend={3.1}
-          trendUp={false}
-        />
-        <StatCard
-          icon={TrendingUp}
-          title="Growth Rate"
-          value={`${growthRate}%`}
-          trend={5.4}
-          trendUp
-        />
-      </div>
+        <TabPanel>
+          {/* Main Stats */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+            <StatCard
+              icon={Package}
+              title="Total Products"
+              value={totalProducts}
+              trend={12}
+              trendUp
+            />
+            <StatCard
+              icon={ShoppingCart}
+              title="Total Sales"
+              value={`₦${totalSales}`}
+              trend={8.2}
+              trendUp
+            />
+            <StatCard
+              icon={DollarSign}
+              title="Net Profit"
+              value={`₦${netProfit}`}
+              trend={3.1}
+              trendUp={false}
+            />
+            <StatCard
+              icon={TrendingUp}
+              title="Growth Rate"
+              value={`${growthRate}%`}
+              trend={5.4}
+              trendUp
+            />
+          </div>
 
-      {/* Charts Section */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
-        <ChartCard title="Sales Overview">
-          <ResponsiveContainer width="100%" height={300}>
-            <LineChart data={salesData}>
-              <CartesianGrid strokeDasharray="3 3" />
-              <XAxis dataKey="month" />
-              <YAxis />
-              <Tooltip />
-              <Legend />
-              <Line type="monotone" dataKey="sales" stroke="#4F46E5" />
-              <Line type="monotone" dataKey="profit" stroke="#10B981" />
-            </LineChart>
-          </ResponsiveContainer>
-        </ChartCard>
+          {/* Charts Section */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+            <ChartCard title="Sales Overview">
+              <ResponsiveContainer width="100%" height={300}>
+                <LineChart data={salesData}>
+                  <CartesianGrid strokeDasharray="3 3" />
+                  <XAxis dataKey="month" />
+                  <YAxis />
+                  <Tooltip />
+                  <Legend />
+                  <Line type="monotone" dataKey="sales" stroke="#4F46E5" />
+                  <Line type="monotone" dataKey="profit" stroke="#10B981" />
+                </LineChart>
+              </ResponsiveContainer>
+            </ChartCard>
 
-        <ChartCard title="Product Performance">
-          <ResponsiveContainer width="100%" height={300}>
-            <BarChart data={topProducts}>
-              <CartesianGrid strokeDasharray="3 3" />
-              <XAxis dataKey="name" />
-              <YAxis />
-              <Tooltip />
-              <Legend />
-              <Bar dataKey="sales" fill="#4F46E5" />
-              <Bar dataKey="revenue" fill="#10B981" />
-            </BarChart>
-          </ResponsiveContainer>
-        </ChartCard>
-      </div>
+            <ChartCard title="Product Performance">
+              <ResponsiveContainer width="100%" height={300}>
+                <BarChart data={topProducts}>
+                  <CartesianGrid strokeDasharray="3 3" />
+                  <XAxis dataKey="name" />
+                  <YAxis />
+                  <Tooltip />
+                  <Legend />
+                  <Bar dataKey="sales" fill="#4F46E5" />
+                  <Bar dataKey="revenue" fill="#10B981" />
+                </BarChart>
+              </ResponsiveContainer>
+            </ChartCard>
+          </div>
 
-      {/* Top Products Table */}
-      <div className="bg-white rounded-lg shadow-sm p-6">
-        <h3 className="text-lg font-semibold mb-4">Top Performing Products</h3>
-        <div className="overflow-x-auto">
-          <table className="min-w-full divide-y divide-gray-200">
-            <thead>
-              <tr>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
-                  Product Name
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
-                  Sales
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
-                  Revenue
-                </th>
-              </tr>
-            </thead>
-            <tbody className="bg-white divide-y divide-gray-200">
-              {topProducts.length > 0 ? (
-                topProducts.map((product, index) => (
-                  <tr key={index}>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      {product.product__name}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      {product.total_sold}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">N/A</td>
+          {/* Top Products Table */}
+          <div className="bg-white rounded-lg shadow-sm p-6">
+            <h3 className="text-lg font-semibold mb-4">
+              Top Performing Products
+            </h3>
+            <div className="overflow-x-auto">
+              <table className="min-w-full divide-y divide-gray-200">
+                <thead>
+                  <tr>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                      Product Name
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                      Sales
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                      Revenue
+                    </th>
                   </tr>
-                ))
-              ) : (
-                <tr>
-                  <td className="px-6 py-4 whitespace-nowrap" colSpan="3">
-                    No data available
-                  </td>
-                </tr>
-              )}
-            </tbody>
-          </table>
-        </div>
-      </div>
+                </thead>
+                <tbody className="bg-white divide-y divide-gray-200">
+                  {topProducts.length > 0 ? (
+                    topProducts.map((product, index) => (
+                      <tr key={index}>
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          {product.product__name}
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          {product.total_sold}
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap">N/A</td>
+                      </tr>
+                    ))
+                  ) : (
+                    <tr>
+                      <td className="px-6 py-4 whitespace-nowrap" colSpan="3">
+                        No data available
+                      </td>
+                    </tr>
+                  )}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </TabPanel>
+
+        <TabPanel>
+          <SalesReport />
+        </TabPanel>
+
+        <TabPanel>
+          <InventoryReport />
+        </TabPanel>
+      </Tabs>
     </div>
   );
 };

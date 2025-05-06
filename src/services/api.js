@@ -8,6 +8,16 @@ const api = axios.create({
   headers: {
     "Content-Type": "application/json",
   },
+
+  getSalesReport: (params) =>
+    axios.get("http://localhost:8000/store/api/reports/sales/", { params }),
+  getInventoryReport: (params) =>
+    axios.get("http://localhost:8000/store/api/reports/inventory/", { params }),
+  exportSalesReport: (params) =>
+    axios.get("http://localhost:8000/store/api/reports/sales/export/", {
+      params,
+      responseType: "blob",
+    }),
 });
 
 export default api;
