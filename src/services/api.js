@@ -1,7 +1,8 @@
 // src/services/api.js
 import axios from "axios";
 
-const API_URL = "http://localhost:8000/store/api";
+const API_URL =
+  "https://store-management-system-backend-wr2w.onrender.com/store/api";
 
 const api = axios.create({
   baseURL: API_URL,
@@ -10,14 +11,23 @@ const api = axios.create({
   },
 
   getSalesReport: (params) =>
-    axios.get("http://localhost:8000/store/api/reports/sales/", { params }),
+    axios.get(
+      "https://store-management-system-backend-wr2w.onrender.com/store/api/reports/sales/",
+      { params }
+    ),
   getInventoryReport: (params) =>
-    axios.get("http://localhost:8000/store/api/reports/inventory/", { params }),
+    axios.get(
+      "https://store-management-system-backend-wr2w.onrender.com/store/api/reports/inventory/",
+      { params }
+    ),
   exportSalesReport: (params) =>
-    axios.get("http://localhost:8000/store/api/reports/sales/export/", {
-      params,
-      responseType: "blob",
-    }),
+    axios.get(
+      "https://store-management-system-backend-wr2w.onrender.com/store/api/reports/sales/export/",
+      {
+        params,
+        responseType: "blob",
+      }
+    ),
 });
 
 export default api;
