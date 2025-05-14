@@ -44,7 +44,7 @@ const StoreDashboard = () => {
 
   const fetchDashboardData = async () => {
     try {
-      const response = await api.get("/dashboard");
+      const response = await api.get("/dashboard/");
       console.log(response.data);
 
       // Fix the key names to match the API response
