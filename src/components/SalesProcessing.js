@@ -49,16 +49,19 @@ const SalesManagement = () => {
   }, []);
 
   const handleSearch = () => {
-    const results = products.filter(
-      (product) =>
+    const results = products.filter((product) => {
+      const barcode = product.barcode || "";
+      return (
         product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        product.barcode.includes(searchTerm)
-    );
+        barcode.toLowerCase().includes(searchTerm.toLowerCase())
+      );
+    });
     setSearchResults(results);
     setIsProductModalOpen(true);
   };
 
   const addToCart = (product) => {
+    const numericPrice = Number(product.price) || 0;
     const existingCartItem = cart.find((item) => item.id === product.id);
 
     if (existingCartItem) {
@@ -66,11 +69,11 @@ const SalesManagement = () => {
         cart.map((item) =>
           item.id === product.id
             ? { ...item, quantity: item.quantity + quantity }
-            : item
-        )
+            : item,
+        ),
       );
     } else {
-      setCart([...cart, { ...product, quantity }]);
+      setCart([...cart, { ...product, quantity, price: numericPrice }]);
     }
 
     setIsProductModalOpen(false);
@@ -86,14 +89,17 @@ const SalesManagement = () => {
     if (newQuantity > 0) {
       setCart(
         cart.map((item) =>
-          item.id === productId ? { ...item, quantity: newQuantity } : item
-        )
+          item.id === productId ? { ...item, quantity: newQuantity } : item,
+        ),
       );
     }
   };
 
   const calculateTotal = () => {
-    return cart.reduce((total, item) => total + item.price * item.quantity, 0);
+    return cart.reduce(
+      (total, item) => total + (Number(item.price) || 0) * item.quantity,
+      0,
+    );
   };
 
   const processCheckout = async () => {
@@ -103,7 +109,7 @@ const SalesManagement = () => {
           store: store.id,
           product: item.id,
           quantity: item.quantity,
-        })
+        }),
       );
 
       await Promise.all(salesPromises);
@@ -115,53 +121,78 @@ const SalesManagement = () => {
   };
 
   const generateReceipt = () => {
-    const receiptWindow = window.open("", "Receipt", "width=600,height=800");
-    receiptWindow.document.write(`
+    const receiptWindow = window.open("", "Receipt", "width=400,height=700");
+    if (!receiptWindow) {
+      alert("Please allow popups to print the receipt.");
+      return;
+    }
+
+    const storeName = store?.name || "STORE NAME";
+    const storeAddress = store?.address || "123 Market Road, City, Country";
+    const storePhone = store?.phone_number || "000-000-0000";
+    const receiptNumber = `INV-${Date.now()}`;
+    const cashier = "Salesperson";
+    const dateString = new Date().toLocaleString();
+
+    const receiptHtml = `
       <html>
         <head>
-          <title>Sales Receipt</title>
+          <title>Receipt</title>
           <style>
-            body { font-family: Arial, sans-serif; max-width: 500px; margin: 0 auto; }
+            body { font-family: monospace; width: 280px; margin: 0 auto; padding: 16px; }
+            .center { text-align: center; }
+            .small { font-size: 12px; }
+            .bold { font-weight: bold; }
+            .divider { margin: 10px 0; border-top: 1px dashed #000; }
             table { width: 100%; border-collapse: collapse; }
-            th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+            td { padding: 4px 0; }
+            .right { text-align: right; }
+            .total { font-size: 14px; font-weight: bold; }
           </style>
         </head>
         <body>
-          <h1>${store.name} - Sales Receipt</h1>
-          <p>Date: ${new Date().toLocaleString()}</p>
+          <div class="center bold" style="font-size:16px;">${storeName}</div>
+          <div class="center small">${storeAddress}</div>
+          <div class="center small">Tel: ${storePhone}</div>
+          <div class="center small">-----------------------------</div>
+          <div class="small">Receipt: ${receiptNumber}</div>
+          <div class="small">Date: ${dateString}</div>
+          <div class="small">Cashier: ${cashier}</div>
+          <div class="divider"></div>
           <table>
-            <thead>
-              <tr>
-                <th>Product</th>
-                <th>Quantity</th>
-                <th>Price</th>
-                <th>Total</th>
-              </tr>
-            </thead>
             <tbody>
               ${cart
-                .map(
-                  (item) => `
-                <tr>
-                  <td>${item.name}</td>
-                  <td>${item.quantity}</td>
-                  <td>₦${item.price}</td>
-                  <td>₦${item.price * item.quantity}</td>
-                </tr>
-              `
-                )
+                .map((item) => {
+                  const itemPrice = Number(item.price) || 0;
+                  const subtotal = itemPrice * item.quantity;
+                  return `
+                    <tr>
+                      <td>${item.name}</td>
+                      <td class="right">${item.quantity} x ₦${itemPrice.toFixed(2)}</td>
+                    </tr>
+                    <tr>
+                      <td colspan="2" class="right">Subtotal: ₦${subtotal.toFixed(2)}</td>
+                    </tr>
+                  `;
+                })
                 .join("")}
             </tbody>
-            <tfoot>
-              <tr>
-                <td colspan="3">Total</td>
-                <td>₦${calculateTotal()}</td>
-              </tr>
-            </tfoot>
           </table>
+          <div class="divider"></div>
+          <table>
+            <tr>
+              <td class="bold">Total</td>
+              <td class="right total">₦${calculateTotal().toFixed(2)}</td>
+            </tr>
+          </table>
+          <div class="divider"></div>
+          <div class="center small">Thank you for shopping with us!</div>
+          <div class="center small">Visit again.</div>
         </body>
       </html>
-    `);
+    `;
+
+    receiptWindow.document.write(receiptHtml);
     receiptWindow.document.close();
     receiptWindow.print();
   };
@@ -288,7 +319,7 @@ const SalesManagement = () => {
                 {searchResults.map((product) => (
                   <TableRow key={product.id}>
                     <TableCell>{product.name}</TableCell>
-                    <TableCell>{product.barcode}</TableCell>
+                    <TableCell>{product.barcode || "N/A"}</TableCell>
                     <TableCell>₦{product.price}</TableCell>
                     <TableCell>{product.stock_quantity}</TableCell>
                     <TableCell>

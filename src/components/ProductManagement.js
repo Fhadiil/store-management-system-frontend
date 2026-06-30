@@ -90,17 +90,19 @@ const ProductManagement = () => {
 
     // Search filter
     if (searchTerm) {
-      filtered = filtered.filter(
-        (product) =>
+      filtered = filtered.filter((product) => {
+        const barcode = product.barcode || "";
+        return (
           product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-          product.barcode.toLowerCase().includes(searchTerm.toLowerCase())
-      );
+          barcode.toLowerCase().includes(searchTerm.toLowerCase())
+        );
+      });
     }
 
     // Store filter
     if (selectedStore && selectedStore !== "all") {
       filtered = filtered.filter(
-        (product) => product.store?.id === selectedStore
+        (product) => product.store?.id === selectedStore,
       );
     }
 
@@ -194,7 +196,7 @@ const ProductManagement = () => {
       name: product.name,
       price: product.price,
       stock_quantity: product.stock_quantity,
-      barcode: product.barcode,
+      barcode: product.barcode || "",
       store_id: product.store ? product.store.id : "",
     });
     setIsModalOpen(true);
@@ -329,14 +331,14 @@ const ProductManagement = () => {
                             product.stock_quantity <= 10
                               ? "bg-red-100 text-red-800"
                               : product.stock_quantity <= 20
-                              ? "bg-yellow-100 text-yellow-800"
-                              : "bg-green-100 text-green-800"
+                                ? "bg-yellow-100 text-yellow-800"
+                                : "bg-green-100 text-green-800"
                           }`}
                         >
                           {product.stock_quantity}
                         </span>
                       </TableCell>
-                      <TableCell>{product.barcode}</TableCell>
+                      <TableCell>{product.barcode || "N/A"}</TableCell>
                       <TableCell>{product.store?.name || "N/A"}</TableCell>
                       <TableCell>
                         <div className="flex space-x-2">
@@ -412,7 +414,7 @@ const ProductManagement = () => {
             <Input
               value={formData.barcode}
               onChange={(e) => handleChange("barcode", e.target.value)}
-              required
+              placeholder="Optional"
             />
 
             <Label>Store</Label>
