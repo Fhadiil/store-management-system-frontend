@@ -1,5 +1,6 @@
 import React, { useState } from "react";
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
+import { useAuth } from "../contexts/AuthContext";
 import {
   Store,
   Package,
@@ -9,6 +10,7 @@ import {
   Menu,
   X,
   Building2,
+  Users,
 } from "lucide-react";
 import { Button } from "./ui/Button";
 
@@ -27,6 +29,11 @@ const Logo = () => (
 // Layout wrapper component
 const Layout = ({ children }) => {
   const [isOpen, setIsOpen] = useState(false);
+  const { isAuthenticated } = useAuth();
+
+  if (!isAuthenticated) {
+    return children;
+  }
 
   return (
     <div className="flex min-h-screen bg-background">
@@ -53,8 +60,11 @@ const Layout = ({ children }) => {
 
 const Sidebar = ({ isOpen, setIsOpen }) => {
   const location = useLocation();
+  const navigate = useNavigate();
+  const { logout, isAdmin, user } = useAuth();
 
-  const links = [
+  // Admin navigation
+  const adminLinks = [
     {
       to: "/dashboard",
       icon: <BarChart3 className="w-5 h-5" />,
@@ -79,7 +89,25 @@ const Sidebar = ({ isOpen, setIsOpen }) => {
       label: "Sales",
       description: "Orders & Revenue",
     },
+    {
+      to: "/users",
+      icon: <Users className="w-5 h-5" />,
+      label: "Users",
+      description: "Manage Sales Staff",
+    },
   ];
+
+  // Sales person navigation (only sales)
+  const salesLinks = [
+    {
+      to: "/sales",
+      icon: <ShoppingCart className="w-5 h-5" />,
+      label: "Sales",
+      description: "Make Sales",
+    },
+  ];
+
+  const links = isAdmin ? adminLinks : salesLinks;
 
   const sidebarClasses = `
     fixed top-0 left-0 z-40 h-screen bg-background border-r
@@ -93,6 +121,11 @@ const Sidebar = ({ isOpen, setIsOpen }) => {
     hover:bg-accent hover:text-accent-foreground
     ${isActive ? "bg-accent text-accent-foreground" : "text-muted-foreground"}
   `;
+
+  const handleLogout = () => {
+    logout();
+    navigate("/login", { replace: true });
+  };
 
   return (
     <>
@@ -110,6 +143,15 @@ const Sidebar = ({ isOpen, setIsOpen }) => {
           {/* Header with Logo - Hidden on mobile as it's in the top bar */}
           <div className="h-16 hidden md:flex items-center border-b px-4">
             <Logo />
+          </div>
+
+          {/* User Info */}
+          <div className="px-4 py-3 border-b">
+            <p className="text-xs text-muted-foreground">Logged in as:</p>
+            <p className="font-medium text-sm capitalize">{user?.username}</p>
+            <p className="text-xs text-muted-foreground capitalize mt-1">
+              {user?.role === "admin" ? "Administrator" : "Sales Person"}
+            </p>
           </div>
 
           {/* Navigation */}
@@ -143,10 +185,7 @@ const Sidebar = ({ isOpen, setIsOpen }) => {
             <Button
               variant="destructive"
               className="w-full justify-start"
-              onClick={() => {
-                // Add logout logic here
-                setIsOpen(false);
-              }}
+              onClick={handleLogout}
             >
               <LogOut className="w-5 h-5 mr-2" />
               <span className="font-medium">Logout</span>
