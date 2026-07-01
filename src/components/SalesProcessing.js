@@ -246,7 +246,18 @@ const SalesManagement = () => {
                         >
                           <Minus className="h-4 w-4" />
                         </Button>
-                        <span>{item.quantity}</span>
+                        <Input
+                          type="number"
+                          min="1"
+                          value={item.quantity}
+                          className="w-20 text-center"
+                          onChange={(e) =>
+                            updateQuantity(
+                              item.id,
+                              Math.max(1, Number(e.target.value) || 1),
+                            )
+                          }
+                        />
                         <Button
                           variant="outline"
                           size="icon"
@@ -346,7 +357,15 @@ const SalesManagement = () => {
                 >
                   <Minus className="h-4 w-4" />
                 </Button>
-                <span>{quantity}</span>
+                <Input
+                  type="number"
+                  min="1"
+                  value={quantity}
+                  className="w-20 text-center"
+                  onChange={(e) =>
+                    setQuantity(Math.max(1, Number(e.target.value) || 1))
+                  }
+                />
                 <Button
                   variant="outline"
                   size="icon"
